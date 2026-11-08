@@ -1,5 +1,7 @@
 # Neural Network Drawing Board
 
+**Live demo: https://tonyw-y.github.io/neural-network-drawing-board/**
+
 Draw a digit (0–9) or a letter (A–Z) and watch a small neural network classify it live. Every layer is shown as the matrix–vector product it really is:
 
 ```
