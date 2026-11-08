@@ -3,11 +3,13 @@ import { DrawingBoard, INK_SIZE } from "./draw";
 import { type Activations, type Model, forward, loadModel } from "./nn";
 import { PredictionCard } from "./prediction";
 import { normalize } from "./preprocess";
+import { NetworkViz, type ValueMode } from "./viz";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
 const board = new DrawingBoard($<HTMLCanvasElement>("board"));
 const prediction = new PredictionCard();
+const viz = new NetworkViz($<HTMLCanvasElement>("net"));
 
 const models = new Map<Model["name"], Promise<Model>>();
 const getModel = (name: Model["name"]) => {
@@ -25,16 +27,25 @@ function compute() {
   const x = sampleInput ?? (raw ? normalize(raw, INK_SIZE, INK_SIZE) : null);
   acts = x ? forward(model, x) : null;
   prediction.update(model, acts ? acts.a[acts.a.length - 1] : null);
+  viz.setActivations(acts);
   $("board-empty").classList.toggle("hidden", !board.isEmpty);
 }
 
-function loop() {
+function loop(now: number) {
   if (dirty && model) {
     dirty = false;
     compute();
   }
+  viz.frame(now);
   requestAnimationFrame(loop);
 }
+
+$("value-mode").querySelectorAll<HTMLButtonElement>("button").forEach((btn) =>
+  btn.addEventListener("click", () => {
+    $("value-mode").querySelectorAll("button").forEach((b) => b.classList.toggle("on", b === btn));
+    viz.setMode(btn.dataset.mode as ValueMode);
+  }),
+);
 
 // ------------------------------------------------------------ controls
 board.onStart = () => {
@@ -88,6 +99,7 @@ async function selectModel(name: Model["name"]) {
     <span class="chip">${model.meta.params.toLocaleString()} params</span>
     <span class="chip"><span class="acc">${(model.meta.testAccuracy * 100).toFixed(1)}%</span> test acc</span>`;
   prediction.setModel(model);
+  viz.setModel(model);
   dirty = true;
 }
 
