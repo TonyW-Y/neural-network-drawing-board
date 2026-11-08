@@ -183,11 +183,11 @@ export class NetworkViz {
     const bottom = 40;
     const avail = H - top - bottom;
     const narrow = W < 640;
-    const s = Math.max(84, Math.min(W * 0.17, avail * 0.4, 168));
+    const s = Math.max(narrow ? 56 : 84, Math.min(W * 0.17, avail * 0.4, 168));
     this.img = { x: 4, y: top + (avail - s) / 2, s };
 
     const left = this.img.x + s;
-    const right = W - (narrow ? 70 : 84);
+    const right = W - (narrow ? 76 : 84);
     const span = right - left;
     const xs = [0, left + span * 0.32, left + span * 0.66, right];
     this.cols = this.model.sizes.map((n, l) => {
@@ -460,7 +460,7 @@ export class NetworkViz {
       g.textAlign = "center";
       g.font = `600 12.5px ${SANS}`;
       g.fillStyle = on ? "#fff" : "rgba(232,235,244,0.85)";
-      const head = `${names[l]}  `;
+      const head = this.W < 640 ? "" : `${names[l]}  `;
       const symW = (g.measureText(syms[l]).width);
       const headW = g.measureText(head).width;
       const x0 = x - (headW + symW) / 2;
@@ -471,7 +471,7 @@ export class NetworkViz {
       g.textAlign = "center";
       g.font = `400 11px ${MONO}`;
       g.fillStyle = "rgba(139,147,167,0.85)";
-      g.fillText(`ℝ${sup(m.sizes[l])} · ${fns[l]}`, x, 35);
+      g.fillText(this.W < 640 ? (l === 0 ? "28×28" : `${m.sizes[l]}`) : `ℝ${sup(m.sizes[l])} · ${fns[l]}`, x, 35);
     }
   }
 

@@ -252,7 +252,7 @@ input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border: 0; bo
 @media (max-width: 1200px) {
   .layout { grid-template-columns: 320px minmax(0, 1fr); grid-template-areas: "draw pred" "net net" "math math"; }
   .topbar { grid-template-columns: 1fr auto; }
-  .arch { grid-column: 1 / -1; justify-self: start; }
+  .arch { grid-column: 1 / -1; justify-self: start; justify-content: flex-start; }
 }
 @media (max-width: 760px) {
   .topbar { grid-template-columns: 1fr; padding: 16px 16px 4px; }
