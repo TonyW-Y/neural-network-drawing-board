@@ -33,6 +33,9 @@ function compute() {
   viz.setActivations(acts);
   panel.update(model, acts, viz.focus);
   $("board-empty").classList.toggle("hidden", !board.isEmpty);
+  $("net-tip").textContent = acts
+    ? "Hover a neuron to see its dot product · click to pin"
+    : "Draw on the board — the signal flows left → right";
 }
 
 function loop() {

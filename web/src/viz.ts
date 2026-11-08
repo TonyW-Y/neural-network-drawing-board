@@ -416,12 +416,6 @@ export class NetworkViz {
     this.drawNodes(g, now, focus, fe);
     this.drawFooter(g);
 
-    if (this.presence < 0.5 && !focus) {
-      g.font = `500 13px ${SANS}`;
-      g.fillStyle = `rgba(139,147,167,${0.9 * (1 - this.presence * 2) * intro})`;
-      g.textAlign = "center";
-      g.fillText("Draw on the board — the signal flows left → right", (this.cols[1].x + this.cols[2].x) / 2, this.H - 14);
-    }
   }
 
   private drawEdges(g: CanvasRenderingContext2D, l: number, edges: Edge[], alpha: number, t: number, pulses: boolean) {
