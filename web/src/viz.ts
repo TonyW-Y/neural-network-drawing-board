@@ -115,6 +115,11 @@ export class NetworkViz {
     this.drawInput(null);
   }
 
+  pin(f: Focus) {
+    this.pinned = f;
+    this.emitFocus();
+  }
+
   setMode(mode: ValueMode) {
     this.mode = mode;
   }
@@ -364,7 +369,7 @@ export class NetworkViz {
   }
 
   // ---------------------------------------------------------------- render
-  frame(now: number) {
+  frame(now = performance.now()) {
     if (!this.model || this.cols.length === 0) return;
     const dt = Math.min(64, now - this.last);
     this.last = now;
@@ -613,7 +618,7 @@ export class NetworkViz {
     if (big || best || n > 0.15) {
       g.font = `400 ${big ? 11 : 10}px ${MONO}`;
       g.fillStyle = best ? "rgba(253,230,138,0.95)" : `rgba(139,147,167,${0.6 + 0.4 * n})`;
-      g.fillText(v.toFixed(3), x + (big ? 16 : 13), y);
+      g.fillText(v.toFixed(3), x + (big ? 17 : 16), y);
     }
     g.textBaseline = "alphabetic";
   }

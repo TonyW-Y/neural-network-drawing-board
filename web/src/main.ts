@@ -1,6 +1,7 @@
 import "./style.css";
 import { DrawingBoard, INK_SIZE } from "./draw";
 import { type Activations, type Model, forward, loadModel } from "./nn";
+import { MathPanel } from "./math-panel";
 import { PredictionCard } from "./prediction";
 import { normalize } from "./preprocess";
 import { NetworkViz, type ValueMode } from "./viz";
@@ -10,6 +11,8 @@ const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as 
 const board = new DrawingBoard($<HTMLCanvasElement>("board"));
 const prediction = new PredictionCard();
 const viz = new NetworkViz($<HTMLCanvasElement>("net"));
+const panel = new MathPanel();
+viz.onFocus = (f) => model && panel.update(model, acts, f);
 
 const models = new Map<Model["name"], Promise<Model>>();
 const getModel = (name: Model["name"]) => {
@@ -28,15 +31,16 @@ function compute() {
   acts = x ? forward(model, x) : null;
   prediction.update(model, acts ? acts.a[acts.a.length - 1] : null);
   viz.setActivations(acts);
+  panel.update(model, acts, viz.focus);
   $("board-empty").classList.toggle("hidden", !board.isEmpty);
 }
 
-function loop(now: number) {
+function loop() {
   if (dirty && model) {
     dirty = false;
     compute();
   }
-  viz.frame(now);
+  viz.frame();
   requestAnimationFrame(loop);
 }
 
@@ -99,11 +103,12 @@ async function selectModel(name: Model["name"]) {
     <span class="chip">${model.meta.params.toLocaleString()} params</span>
     <span class="chip"><span class="acc">${(model.meta.testAccuracy * 100).toFixed(1)}%</span> test acc</span>`;
   prediction.setModel(model);
+  panel.setModel(model);
   viz.setModel(model);
   dirty = true;
 }
 
-// Deep links: ?model=letters&sample=3
+// Deep links: ?model=letters&sample=3&focus=1:5  (focus = layer:neuron)
 const params = new URLSearchParams(location.search);
 const startModel = params.get("model") === "letters" ? "letters" : "digits";
 
@@ -112,5 +117,7 @@ selectModel(startModel).then(() => {
   placeThumb();
   getModel(startModel === "digits" ? "letters" : "digits"); // prefetch the other model
   if (params.has("sample")) showSample(Number(params.get("sample")) || 0);
+  const [fl, fi] = (params.get("focus") ?? "").split(":").map(Number);
+  if (fl >= 1 && fl <= 3 && fi >= 0 && fi < model.sizes[fl]) viz.pin({ layer: fl, index: fi });
   requestAnimationFrame(loop);
 });
