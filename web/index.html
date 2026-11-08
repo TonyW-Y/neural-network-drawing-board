@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Neural Drawing Board</title>
+    <meta name="description" content="Draw a digit or letter and watch a neural network classify it live, one matrix multiplication at a time." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2367e8f9'/%3E%3Cstop offset='.5' stop-color='%23a78bfa'/%3E%3Cstop offset='1' stop-color='%23fb7185'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='3' y='3' width='26' height='26' rx='8' fill='%2307090f' stroke='url(%23g)' stroke-width='2.5'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%2367e8f9'/%3E%3Ccircle cx='11' cy='21' r='2.6' fill='%23a78bfa'/%3E%3Ccircle cx='21' cy='16' r='3' fill='%23fb7185'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="bg-glow" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <div>
+          <h1>Neural Drawing Board</h1>
+          <p>Watch matrix multiplication read your handwriting</p>
+        </div>
+      </div>
+
+      <div class="seg" id="model-toggle" role="tablist" aria-label="Model">
+        <span class="seg-thumb" aria-hidden="true"></span>
+        <button role="tab" data-model="digits" aria-selected="true">Digits <small>0–9</small></button>
+        <button role="tab" data-model="letters" aria-selected="false">Letters <small>A–Z</small></button>
+      </div>
+
+      <div class="arch" id="arch" aria-label="Architecture"></div>
+    </header>
+
+    <main class="layout">
+      <section class="card draw-card">
+        <div class="card-head">
+          <h2>Draw</h2>
+          <span class="hint" id="draw-hint">a digit 0–9</span>
+        </div>
+        <div class="board" id="board-wrap">
+          <canvas id="board" aria-label="Drawing board"></canvas>
+          <div class="board-empty" id="board-empty">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 20l4-1 10-10-3-3L5 16l-1 4zM14 7l3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Draw here</span>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="btn primary" id="clear">Clear</button>
+          <button class="btn" id="sample">Random sample</button>
+        </div>
+        <label class="slider">
+          <span>Brush</span>
+          <input type="range" id="brush" min="12" max="32" value="20" />
+          <output id="brush-out">20</output>
+        </label>
+      </section>
+
+      <section class="card net-card">
+        <div class="card-head">
+          <h2>Network</h2>
+          <div class="mini-seg" id="value-mode" role="group" aria-label="Node values">
+            <button data-mode="a" class="on" title="Activation after ReLU">a = ReLU(z)</button>
+            <button data-mode="z" title="Pre-activation: the raw matrix product">z = Wx + b</button>
+          </div>
+        </div>
+        <div class="net-wrap">
+          <canvas id="net" aria-label="Neural network diagram"></canvas>
+          <div class="net-tip">Hover a neuron to see its dot product · click to pin</div>
+        </div>
+      </section>
+
+      <section class="card pred-card">
+        <div class="card-head"><h2>Prediction</h2></div>
+        <div class="glyph-box" id="glyph-box">
+          <span class="glyph" id="glyph">?</span>
+        </div>
+        <div class="conf">
+          <div class="conf-row"><span>Confidence</span><b id="conf-val">—</b></div>
+          <div class="conf-bar"><i id="conf-fill"></i></div>
+        </div>
+        <div class="runners">
+          <h3>Top guesses</h3>
+          <ol id="bars"></ol>
+        </div>
+        <dl class="meta" id="meta"></dl>
+      </section>
+
+      <section class="card math-card">
+        <div class="card-head">
+          <h2>The linear algebra</h2>
+          <span class="hint">every layer is one matrix–vector product</span>
+        </div>
+        <div class="equations" id="equations"></div>
+        <div class="detail" id="detail"></div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      Trained from scratch in NumPy · inference runs in your browser as plain matrix multiplication · no ML libraries
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
