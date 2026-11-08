@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+training/data/
+node_modules/
+web/dist/
+.DS_Store
